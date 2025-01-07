@@ -1,6 +1,5 @@
 package org.gabriel.todolist.auth;
 
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +22,13 @@ public class AuthenticationController {
     public ResponseEntity<AuthenticationResponse> register(@RequestBody UserRequestRegister userRequestRegister) {
 
         return ResponseEntity.ok(service.register(userRequestRegister));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest authenticationRequest) {
+
+        return ResponseEntity.ok(service.login(authenticationRequest));
+
     }
 
 
