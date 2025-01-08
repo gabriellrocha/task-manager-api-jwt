@@ -1,6 +1,7 @@
 package org.gabriel.todolist.service;
 
 import org.gabriel.todolist.config.JWTService;
+import org.gabriel.todolist.dto.TaskPagedResponseDTO;
 import org.gabriel.todolist.dto.TaskDTO;
 import org.gabriel.todolist.exception.AccessDeniedException;
 import org.gabriel.todolist.exception.TaskNotFoundException;
@@ -10,8 +11,12 @@ import org.gabriel.todolist.model.User;
 import org.gabriel.todolist.repository.TaskRepository;
 import org.gabriel.todolist.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class TaskService {
@@ -82,6 +87,27 @@ public class TaskService {
         }
 
         taskRepository.delete(task);
+
+    }
+
+    public TaskPagedResponseDTO searchByPage(Pageable pageable) {
+
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        Long userId = userRepository.findUserIdByEmail(email);
+
+        Page<Task> taskPage = taskRepository.findByUserId(userId, pageable);
+
+
+        List<TaskDTO> list = taskPage.getContent()
+                .stream()
+                .map(task -> new TaskDTO(task.getId(), task.getTitle(), task.getDescription()))
+                .toList();
+
+        var taskPaged = new TaskPagedResponseDTO(
+                list, taskPage.getNumber(), taskPage.getSize(), taskPage.getTotalElements());
+
+        return taskPaged;
 
     }
 }

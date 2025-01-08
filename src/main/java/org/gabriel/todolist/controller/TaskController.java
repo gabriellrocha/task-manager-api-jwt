@@ -1,12 +1,14 @@
 package org.gabriel.todolist.controller;
 
 import org.gabriel.todolist.config.JWTService;
+import org.gabriel.todolist.dto.TaskPagedResponseDTO;
 import org.gabriel.todolist.dto.TaskDTO;
 import org.gabriel.todolist.model.Task;
 import org.gabriel.todolist.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,11 +35,6 @@ public class TaskController {
 
     }
 
-    @GetMapping("/todos")
-    public ResponseEntity<?> findAll() {
-
-        return null;
-    }
 
     @GetMapping("/todos/{id}")
     public ResponseEntity<?> findById(@PathVariable Long id, @RequestBody Task task) {
@@ -61,6 +58,16 @@ public class TaskController {
         taskService.delete(id, auth);
 
         return ResponseEntity.noContent().build();
+
+    }
+
+    @GetMapping("/todos")
+    public ResponseEntity<TaskPagedResponseDTO> searchByPage(@RequestParam(defaultValue = "0") int page,
+                                                             @RequestParam(defaultValue = "10") int limit) {
+
+        Pageable pageable = PageRequest.of(page, limit);
+
+        return ResponseEntity.ok(taskService.searchByPage(pageable));
 
     }
 }
