@@ -46,9 +46,13 @@ public class TaskController {
     }
 
     @PutMapping("/todos/{id}")
-    public ResponseEntity<?> update() {
+    public ResponseEntity<TaskDTO> update(
+            @PathVariable Long id,
+            @RequestBody TaskDTO dto,
+            @RequestHeader("Authorization") String auth) {
 
-        return null;
+        return ResponseEntity.ok(taskService.update(id, dto, auth));
+
     }
 
     @DeleteMapping("/todos/{id}")
