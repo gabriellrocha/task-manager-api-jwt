@@ -1,15 +1,13 @@
 package org.gabriel.todolist.auth;
 
-import lombok.*;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 @Getter
-@Setter
 @AllArgsConstructor
-@NoArgsConstructor
-@Builder
 public class AuthenticationResponse {
 
     private String token;
-
 
 }

@@ -1,11 +1,12 @@
 package org.gabriel.todolist.auth;
 
-import lombok.*;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 
 @Getter
-@Setter
 @AllArgsConstructor
-@NoArgsConstructor
 @Builder
 public class UserRequestRegister {
 

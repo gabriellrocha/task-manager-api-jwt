@@ -1,8 +1,9 @@
 package org.gabriel.todolist.service;
 
+import lombok.RequiredArgsConstructor;
 import org.gabriel.todolist.config.JWTService;
-import org.gabriel.todolist.dto.TaskPagedResponseDTO;
 import org.gabriel.todolist.dto.TaskDTO;
+import org.gabriel.todolist.dto.TaskPagedResponseDTO;
 import org.gabriel.todolist.exception.AccessDeniedException;
 import org.gabriel.todolist.exception.TaskNotFoundException;
 import org.gabriel.todolist.exception.UserNotFoundException;
@@ -10,7 +11,6 @@ import org.gabriel.todolist.model.Task;
 import org.gabriel.todolist.model.User;
 import org.gabriel.todolist.repository.TaskRepository;
 import org.gabriel.todolist.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,18 +19,13 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class TaskService {
 
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
     private final JWTService jwtService;
 
-    @Autowired
-    public TaskService(UserRepository userRepository, TaskRepository taskRepository, JWTService jwtService) {
-        this.userRepository = userRepository;
-        this.taskRepository = taskRepository;
-        this.jwtService = jwtService;
-    }
 
     public TaskDTO create(TaskDTO dto, String userEmail) {
 
