@@ -10,6 +10,7 @@ import org.gabriel.todolist.model.User;
 import org.gabriel.todolist.repository.TaskRepository;
 import org.gabriel.todolist.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -47,8 +48,7 @@ public class TaskService {
 
         final String userEmail = jwtService.extractEmail(auth.substring(7));
 
-        Long userId = userRepository.findUserIdByEmail(userEmail)
-                .orElseThrow(() -> new UserNotFoundException("User Not Found"));
+        Long userId = userRepository.findUserIdByEmail(userEmail);
 
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new TaskNotFoundException("Task Not Found"));
@@ -64,5 +64,24 @@ public class TaskService {
         taskRepository.save(task);
 
         return new TaskDTO(task.getId(), task.getTitle(), task.getDescription());
+    }
+
+    public void delete(Long id, String auth) {
+
+        final String userEmail = jwtService.extractEmail(auth.substring(7));
+
+//        System.out.println(SecurityContextHolder.getContext().getAuthentication().getName()); // todo refactor
+
+        Long userId = userRepository.findUserIdByEmail(userEmail);
+
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException("Task Not Found"));
+
+        if(!task.getUser().getId().equals(userId)) {
+            throw new AccessDeniedException("Unauthorized user"); // todo - tratar 403
+        }
+
+        taskRepository.delete(task);
+
     }
 }

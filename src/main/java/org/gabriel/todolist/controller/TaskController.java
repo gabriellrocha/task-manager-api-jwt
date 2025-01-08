@@ -56,10 +56,11 @@ public class TaskController {
     }
 
     @DeleteMapping("/todos/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id, @RequestHeader("Authorization") String auth) {
 
-        return null;
+        taskService.delete(id, auth);
+
+        return ResponseEntity.noContent().build();
+
     }
-
-
 }
