@@ -1,12 +1,10 @@
 package org.gabriel.todolist.service;
 
 import lombok.RequiredArgsConstructor;
-import org.gabriel.todolist.config.JWTService;
 import org.gabriel.todolist.dto.TaskDTO;
 import org.gabriel.todolist.dto.TaskPagedResponseDTO;
 import org.gabriel.todolist.exception.AccessDeniedException;
 import org.gabriel.todolist.exception.TaskNotFoundException;
-import org.gabriel.todolist.exception.UserNotFoundException;
 import org.gabriel.todolist.model.Task;
 import org.gabriel.todolist.model.User;
 import org.gabriel.todolist.repository.TaskRepository;
@@ -24,13 +22,13 @@ public class TaskService {
 
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
-    private final JWTService jwtService;
 
+    public TaskDTO create(TaskDTO dto) {
 
-    public TaskDTO create(TaskDTO dto, String userEmail) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new UserNotFoundException("User Not Found"));
+        User user = userRepository.findByEmail(email)
+                .orElseThrow();
 
 
         Task task = Task.builder()
@@ -39,24 +37,21 @@ public class TaskService {
                 .user(user)
                 .build();
 
-        var taskSave = taskRepository.save(task);
+        Task taskSaved = taskRepository.save(task);
 
-        return new TaskDTO(taskSave.getId(), taskSave.getTitle(), taskSave.getDescription());
+        return new TaskDTO(taskSaved.getId(), taskSaved.getTitle(), taskSaved.getDescription());
     }
 
-    public TaskDTO update(Long id, TaskDTO dto, String auth) {
+    public TaskDTO update(Long id, TaskDTO dto) {
 
-        final String userEmail = jwtService.extractEmail(auth.substring(7));
-
-        Long userId = userRepository.findUserIdByEmail(userEmail);
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new TaskNotFoundException("Task Not Found"));
 
-        if(!task.getUser().getId().equals(userId)) {
+        if(!task.getUser().getEmail().equals(email)) {
             throw new AccessDeniedException("Unauthorized user"); // todo - tratar 403
         }
-
 
         task.setTitle(dto.getTitle());
         task.setDescription(dto.getDescription());
@@ -66,18 +61,14 @@ public class TaskService {
         return new TaskDTO(task.getId(), task.getTitle(), task.getDescription());
     }
 
-    public void delete(Long id, String auth) {
+    public void delete(Long id) {
 
-        final String userEmail = jwtService.extractEmail(auth.substring(7));
-
-//        System.out.println(SecurityContextHolder.getContext().getAuthentication().getName()); // todo refactor
-
-        Long userId = userRepository.findUserIdByEmail(userEmail);
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new TaskNotFoundException("Task Not Found"));
 
-        if(!task.getUser().getId().equals(userId)) {
+        if(!task.getUser().getEmail().equals(email)) {
             throw new AccessDeniedException("Unauthorized user"); // todo - tratar 403
         }
 
@@ -89,20 +80,16 @@ public class TaskService {
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        Long userId = userRepository.findUserIdByEmail(email);
+        Page<Task> taskPage = taskRepository.findByUserEmail(email, pageable);
 
-        Page<Task> taskPage = taskRepository.findByUserId(userId, pageable);
-
-
-        List<TaskDTO> list = taskPage.getContent()
+        List<TaskDTO> list = taskPage
+                .getContent()
                 .stream()
                 .map(task -> new TaskDTO(task.getId(), task.getTitle(), task.getDescription()))
                 .toList();
 
-        var taskPaged = new TaskPagedResponseDTO(
+        return new TaskPagedResponseDTO(
                 list, taskPage.getNumber(), taskPage.getSize(), taskPage.getTotalElements());
-
-        return taskPaged;
 
     }
 }

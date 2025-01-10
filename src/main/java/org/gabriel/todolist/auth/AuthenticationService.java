@@ -20,13 +20,13 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
 
-    public AuthenticationResponse register(UserRequestRegister userRequestRegister) {
+    public AuthenticationResponse register(UserRegister userRegister) {
 
         User user = User.builder()
-                .firstName(userRequestRegister.getFirstName())
-                .lastName(userRequestRegister.getLastName())
-                .email(userRequestRegister.getEmail())
-                .password(passwordEncoder.encode(userRequestRegister.getPassword()))
+                .firstName(userRegister.getFirstName())
+                .lastName(userRegister.getLastName())
+                .email(userRegister.getEmail())
+                .password(passwordEncoder.encode(userRegister.getPassword()))
                 .role(Role.USER)
                 .build();
 
@@ -38,19 +38,20 @@ public class AuthenticationService {
 
     }
 
-    public AuthenticationResponse login(AuthenticationRequest authenticationRequest) {
+    public AuthenticationResponse login(AuthenticationRequest authRequest) {
 
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        authenticationRequest.getEmail(),
-                        authenticationRequest.getPassword()
+                        authRequest.getEmail(),
+                        authRequest.getPassword()
                 )
         );
 
-        final var user = userRepository.findByEmail(authenticationRequest.getEmail())
-                .orElseThrow(); // todo - tratar NoSuchElementException
 
-        final String jwt = jwtService.generateToken(user);
+        var user = userRepository.findByEmail(authRequest.getEmail())
+                .orElseThrow();
+
+        var jwt = jwtService.generateToken(user);
 
         return new AuthenticationResponse(jwt);
     }

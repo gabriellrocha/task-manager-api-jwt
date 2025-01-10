@@ -8,7 +8,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 @Builder
-public class UserRequestRegister {
+public class UserRegister {
 
     private String firstName;
 

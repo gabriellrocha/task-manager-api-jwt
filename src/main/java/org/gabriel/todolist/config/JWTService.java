@@ -21,35 +21,38 @@ public class JWTService {
 
     public String generateToken(UserDetails userDetails) {
 
+
         final Date issuedAt =  new Date(System.currentTimeMillis());
         final Date expiredAt = new Date(issuedAt.getTime() + (24 * 60 * 60 * 1000));
 
         return Jwts.builder()
                 .claim("roles", userDetails.getAuthorities())
-                .setId(UUID.randomUUID().toString()) // jti
-                .setSubject(userDetails.getUsername()) // email
+                .setSubject(userDetails.getUsername()) // sub email
                 .setIssuedAt(issuedAt)
                 .setExpiration(expiredAt)
+                .setId(UUID.randomUUID().toString()) // jti
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+
+        final String email = extractEmail(token);
+
+        return (email.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
     public String extractEmail(String token) {
         return extractClaims(token, Claims::getSubject);
     }
 
-    public boolean isTokenValid(String token, UserDetails user) {
-
-        final String email = extractEmail(token);
-        return user.getUsername().equals(email) && !isTokenExpired(token);
-
-    }
 
     private Date extractExpiration(String token) {
         return extractClaims(token, Claims::getExpiration);
     }
 
     private boolean isTokenExpired(String token) {
+
         return extractExpiration(token).before(new Date());
     }
 
