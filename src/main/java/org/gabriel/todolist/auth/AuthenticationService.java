@@ -47,7 +47,6 @@ public class AuthenticationService {
                 )
         );
 
-
         var user = userRepository.findByEmail(authRequest.getEmail())
                 .orElseThrow();
 

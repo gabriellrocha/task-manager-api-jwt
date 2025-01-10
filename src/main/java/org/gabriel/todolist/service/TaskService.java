@@ -3,7 +3,6 @@ package org.gabriel.todolist.service;
 import lombok.RequiredArgsConstructor;
 import org.gabriel.todolist.dto.TaskDTO;
 import org.gabriel.todolist.dto.TaskPagedResponseDTO;
-import org.gabriel.todolist.exception.AccessDeniedException;
 import org.gabriel.todolist.exception.TaskNotFoundException;
 import org.gabriel.todolist.model.Task;
 import org.gabriel.todolist.model.User;
