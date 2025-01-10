@@ -30,8 +30,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-        final String email;
-        final String jwt;
+
         final String authHeader = request.getHeader("Authorization");
 
         if(authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -39,27 +38,21 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        jwt = authHeader.substring(7);
+        final String jwt = authHeader.substring(7);
 
-        email = jwtService.extractEmail(jwt);
+        final String userEmail = jwtService.extractEmail(jwt); // todo - já realiza a validação
 
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(email);
+        UsernamePasswordAuthenticationToken authUser = new UsernamePasswordAuthenticationToken(
+                userDetails,
+                null,
+                userDetails.getAuthorities()
+        );
 
-            if (jwtService.isTokenValid(jwt, userDetails)) {
+        authUser.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                UsernamePasswordAuthenticationToken authUser = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-
-                authUser.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                SecurityContextHolder.getContext().setAuthentication(authUser);
-            }
-        }
+        SecurityContextHolder.getContext().setAuthentication(authUser);
 
         filterChain.doFilter(request, response);
     }

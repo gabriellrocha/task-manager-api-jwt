@@ -1,7 +1,6 @@
 package org.gabriel.todolist.auth;
 
 import org.hibernate.exception.ConstraintViolationException;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -20,9 +19,7 @@ public class AuthenticationExceptionHandler { // todo - refactor objeto padrão 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<String> handlerConstraintViolationException(ConstraintViolationException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("email already exists");
-        }
     }
 
-
-
+}
 

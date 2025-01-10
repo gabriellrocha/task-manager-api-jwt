@@ -22,6 +22,7 @@ public class TaskService {
 
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
+    private final AuthorizationService authorizationService;
 
     public TaskDTO create(TaskDTO dto) {
 
@@ -44,14 +45,10 @@ public class TaskService {
 
     public TaskDTO update(Long id, TaskDTO dto) {
 
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new TaskNotFoundException("Task Not Found"));
 
-        if(!task.getUser().getEmail().equals(email)) {
-            throw new AccessDeniedException("Unauthorized user"); // todo - tratar 403
-        }
+        authorizationService.checkAuthorization(task);
 
         task.setTitle(dto.getTitle());
         task.setDescription(dto.getDescription());
@@ -63,14 +60,10 @@ public class TaskService {
 
     public void delete(Long id) {
 
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new TaskNotFoundException("Task Not Found"));
 
-        if(!task.getUser().getEmail().equals(email)) {
-            throw new AccessDeniedException("Unauthorized user"); // todo - tratar 403
-        }
+        authorizationService.checkAuthorization(task);
 
         taskRepository.delete(task);
 
@@ -92,4 +85,5 @@ public class TaskService {
                 list, taskPage.getNumber(), taskPage.getSize(), taskPage.getTotalElements());
 
     }
+
 }

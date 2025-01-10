@@ -25,6 +25,7 @@ public class JWTService {
         final Date issuedAt =  new Date(System.currentTimeMillis());
         final Date expiredAt = new Date(issuedAt.getTime() + (24 * 60 * 60 * 1000));
 
+
         return Jwts.builder()
                 .claim("roles", userDetails.getAuthorities())
                 .setSubject(userDetails.getUsername()) // sub email
@@ -35,27 +36,10 @@ public class JWTService {
                 .compact();
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-
-        final String email = extractEmail(token);
-
-        return (email.equals(userDetails.getUsername()) && !isTokenExpired(token));
-    }
 
     public String extractEmail(String token) {
         return extractClaims(token, Claims::getSubject);
     }
-
-
-    private Date extractExpiration(String token) {
-        return extractClaims(token, Claims::getExpiration);
-    }
-
-    private boolean isTokenExpired(String token) {
-
-        return extractExpiration(token).before(new Date());
-    }
-
 
     private <T> T extractClaims(String token, Function<Claims, T> claimsResolver) {
 
@@ -63,11 +47,13 @@ public class JWTService {
         return claimsResolver.apply(claims);
     }
 
-
     private Claims extractAllClaims(String token) {
+
+        // todo - JwtParser já realiza validações como: estrutura, assinatura, expiração em UTC - Pesquise
 
         return Jwts
                 .parserBuilder()
+                .setAllowedClockSkewSeconds(60) // tolerância exp - segundos
                 .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)

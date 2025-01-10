@@ -6,13 +6,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.gabriel.todolist.interfaces.Authorizable;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Entity(name = "tasks")
-public class Task {
+public class Task implements Authorizable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -28,4 +29,9 @@ public class Task {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @Override
+    public String getOwnerEmail() {
+        return user.getEmail();
+    }
 }
