@@ -1,9 +1,11 @@
 package org.gabriel.todolist.service;
 
 import lombok.RequiredArgsConstructor;
-import org.gabriel.todolist.dto.TaskDTO;
-import org.gabriel.todolist.dto.TaskPagedResponseDTO;
-import org.gabriel.todolist.exception.TaskNotFoundException;
+import org.gabriel.todolist.dto.TaskRequest;
+import org.gabriel.todolist.dto.TaskResponse;
+import org.gabriel.todolist.dto.TaskMapper;
+import org.gabriel.todolist.dto.TaskPaged;
+import org.gabriel.todolist.exception.ResourceNotFoundException;
 import org.gabriel.todolist.model.Task;
 import org.gabriel.todolist.model.User;
 import org.gabriel.todolist.repository.TaskRepository;
@@ -14,75 +16,99 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
 public class TaskService {
 
+    private final TaskRepository repository;
     private final UserRepository userRepository;
-    private final TaskRepository taskRepository;
     private final AuthorizationService authorizationService;
+    private final TaskMapper taskMapper;
 
-    public TaskDTO create(TaskDTO dto) {
+    public TaskResponse create(TaskRequest request) {
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "User not found for email: " + email
+                ));
 
+        Task task = taskMapper.fromDtoRequest(request);
+        task.setUser(user);
 
-        Task task = Task.builder()
-                .title(dto.getTitle())
-                .description(dto.getDescription())
-                .user(user)
-                .build();
-
-        Task taskSaved = taskRepository.save(task);
-
-        return new TaskDTO(taskSaved.getId(), taskSaved.getTitle(), taskSaved.getDescription());
+        return taskMapper.fromTask(repository.save(task));
     }
 
-    public TaskDTO update(Long id, TaskDTO dto) {
+    public TaskResponse update(Long id, TaskRequest request) {
 
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new TaskNotFoundException("Task Not Found"));
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "User not found for email: " + email
+                ));
+
+        Task task = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Task with id [%s] not found".formatted(id)));
 
         authorizationService.checkAuthorization(task);
 
-        task.setTitle(dto.getTitle());
-        task.setDescription(dto.getDescription());
+        task.setTitle(request.title());
+        task.setDescription(request.description());
+        task.setPriority(request.priority());
+        task.setStatus(request.status());
+        task.setUser(user);
 
-        taskRepository.save(task);
+        return taskMapper.fromTask(repository.save(task));
 
-        return new TaskDTO(task.getId(), task.getTitle(), task.getDescription());
     }
 
     public void delete(Long id) {
 
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new TaskNotFoundException("Task Not Found"));
+        Task task = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Task with id [%s] not found".formatted(id)));
 
         authorizationService.checkAuthorization(task);
 
-        taskRepository.delete(task);
+        repository.delete(task);
 
     }
 
-    public TaskPagedResponseDTO searchByPage(Pageable pageable) {
+    public TaskPaged searchByPage(Pageable pageable) {
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        Page<Task> taskPage = taskRepository.findByUserEmail(email, pageable);
+        Page<Task> page = repository.findByUserEmail(email, pageable);
 
-        List<TaskDTO> list = taskPage
+        List<TaskResponse> list = page
                 .getContent()
                 .stream()
-                .map(task -> new TaskDTO(task.getId(), task.getTitle(), task.getDescription()))
+                .map(taskToTaskDto())
                 .toList();
 
-        return new TaskPagedResponseDTO(
-                list, taskPage.getNumber(), taskPage.getSize(), taskPage.getTotalElements());
 
+        return TaskPaged.builder()
+                .tasks(list)
+                .page(page.getNumber())
+                .limit(page.getSize())
+                .total(page.getTotalElements())
+                .build();
     }
 
+    private Function<Task, TaskResponse> taskToTaskDto() {
+
+        return task -> new TaskResponse(
+                task.getId(),
+                task.getTitle(),
+                task.getDescription(),
+                task.getCreatedAt(),
+                task.getPriority(),
+                task.getStatus()
+        );
+    }
 }

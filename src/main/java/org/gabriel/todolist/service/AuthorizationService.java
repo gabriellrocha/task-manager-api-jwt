@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthorizationService {
 
-    public void checkAuthorization(Authorizable authorizable) {
+    public void checkAuthorization(Authorizable authorizable) {  // TODO: check owner
 
         var userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
 

@@ -40,8 +40,8 @@ public class GlobalExceptionHandler {
                         .build());
     }
 
-    @ExceptionHandler(TaskNotFoundException.class)
-    public ResponseEntity<RestErrorResponse> handlerTaskNotFoundException(TaskNotFoundException e) {
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<RestErrorResponse> handlerTaskNotFoundException(ResourceNotFoundException e) {
 
         return ResponseEntity.status(404).body(
                 new RestErrorResponse.RestErrorResponseBuilder()
