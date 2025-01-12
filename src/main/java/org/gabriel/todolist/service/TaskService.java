@@ -79,11 +79,13 @@ public class TaskService {
 
     }
 
-    public TaskPaged searchByPage(Pageable pageable) {
+    public TaskPaged searchByPage(String priority, String status, Pageable pageable) {
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        Page<Task> page = repository.findByUserEmail(email, pageable);
+        TaskSpecification spec = new TaskSpecification(priority, status, email);
+
+        Page<Task> page = repository.findAll(spec, pageable);
 
         List<TaskResponse> list = page
                 .getContent()
@@ -99,6 +101,7 @@ public class TaskService {
                 .total(page.getTotalElements())
                 .build();
     }
+
 
     private Function<Task, TaskResponse> taskToTaskDto() {
 

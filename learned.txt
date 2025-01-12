@@ -1,0 +1,2 @@
+Pageable - encapsula as informações de paginação e ordenação
+Specification -
