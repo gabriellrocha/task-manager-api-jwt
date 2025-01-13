@@ -56,9 +56,9 @@ public class TaskController {
 
     @GetMapping("/tasks")
     public ResponseEntity<TaskPaged> searchByPage(
-            @RequestParam(required = false) String priority,
-            @RequestParam(required = false) String status,
-            @PageableDefault(sort = "title") Pageable pageable
+            @RequestParam(defaultValue = "HIGH") String priority,
+            @RequestParam(defaultValue = "PENDING") String status,
+            @PageableDefault(sort = "createdAt") Pageable pageable
     ) {
 
 
