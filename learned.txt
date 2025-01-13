@@ -1,2 +1,5 @@
-Pageable - encapsula as informações de paginação e ordenação
-Specification -
+Pageable - encapsula as informações de paginação e ordenação.
+    I.e. número da página, tamanho(quantos itens por página) e ordenação dos resultados (campos(s) e direção)
+
+Specification - encapsula as condições de filtros.
+    usado para construir a consulta dinamicamente, como "status igual a 'COMPLETED'"

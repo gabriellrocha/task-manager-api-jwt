@@ -1,5 +1,6 @@
 package org.gabriel.todolist.auth;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,15 +17,17 @@ public class AuthenticationController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody UserRegister userRegister) {
+    public ResponseEntity<AuthenticationResponse> register(
+            @Valid @RequestBody UserRegister userRegister) {
 
         return ResponseEntity.ok(service.register(userRegister));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest authenticationRequest) {
+    public ResponseEntity<AuthenticationResponse> login(
+            @Valid @RequestBody AuthenticationRequest authenticationRequest) {
+
         return ResponseEntity.ok(service.login(authenticationRequest));
 
     }
-
 }

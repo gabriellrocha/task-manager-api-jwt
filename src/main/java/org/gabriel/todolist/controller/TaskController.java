@@ -1,5 +1,6 @@
 package org.gabriel.todolist.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.gabriel.todolist.dto.TaskRequest;
 import org.gabriel.todolist.dto.TaskResponse;
@@ -20,7 +21,9 @@ public class TaskController {
     private final TaskService taskService;
 
     @PostMapping("tasks")
-    public ResponseEntity<TaskResponse> create(@RequestBody TaskRequest request) {
+    public ResponseEntity<TaskResponse> create(@Valid @RequestBody TaskRequest request) {
+
+        System.out.println(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(taskService.create(request));
 
@@ -34,6 +37,7 @@ public class TaskController {
 
     @PutMapping("tasks/{id}")
     public ResponseEntity<TaskResponse> update(
+            @Valid
             @PathVariable Long id,
             @RequestBody TaskRequest request) {
 
