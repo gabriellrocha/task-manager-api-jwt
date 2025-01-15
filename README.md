@@ -6,6 +6,8 @@ API REST que permite aos usuários gerenciar listas de tarefas. A aplicação of
 - Autenticação baseada em JWT
 - Controle de autorização para garantir que apenas os criadores possam excluir ou alterar recursos
 
+### Inspiration - https://roadmap.sh/projects/todo-list-api
+
 ## Tecnologias
 
 - Java 17
@@ -37,7 +39,7 @@ git clone https://github.com/gabriellrocha/task-manager-api-jwt.git
 ```
 
 ### Configuração
-Crie um arquivo '.env' na `raiz do projeto` e preencha com os valores das variáveis de ambiente conforme
+Crie um arquivo `.env` na raiz do projeto e preencha com os valores das variáveis de ambiente conforme
 o modelo presente no arquivo '.env.example' também na raiz deste projeto
 
 - Nota: A chave secreta deve estar em Base64 e ter pelo menos 256bits
@@ -78,3 +80,6 @@ para os endpoints protegidos
 | priority |         filtra as tasks por prioridade          |     HIGH      |             LOW, MEDIUM              |
 |   sort   | ordena por campo + `asc` ou `desc` para direção | createdAt,asc | description, priority, status, title |
 |   size   |         quantidade de tasks por página          |      10       |             ? número > 0             |
+
+
+### Project URL https://roadmap.sh/projects/todo-list-api
