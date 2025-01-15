@@ -6,8 +6,6 @@ API REST que permite aos usuários gerenciar listas de tarefas. A aplicação of
 - Autenticação baseada em JWT
 - Controle de autorização para garantir que apenas os criadores possam excluir ou alterar recursos
 
-### Inspiration - https://roadmap.sh/projects/todo-list-api
-
 ## Tecnologias
 
 - Java 17
