@@ -1,10 +1,9 @@
 # Task Manager - API REST
-
 API REST que permite aos usuários gerenciar listas de tarefas. A aplicação oferece:
 - Registro e login de usuários
 - Operações CRUD para tarefas
 - Ordenação e filtragem para personalizar as visualizações
-- Segurança garantida por autenticação baseada em JWT
+- Autenticação baseada em JWT
 - Controle de autorização para garantir que apenas os criadores possam excluir ou alterar recursos
 
 ## Tecnologias
@@ -17,38 +16,46 @@ API REST que permite aos usuários gerenciar listas de tarefas. A aplicação of
 - Lombok
 - JJWT API
 - MapStruct
+- Docker
+- Docker Compose
 
 ## Requisitos
 
-- JDK 17
-
-- Maven instalado para construir e executar a aplicação
-
-- PostgreSQL instalado e configurado. Certifique-se de criar o banco de dados necessário e ajustar as credenciais
-no arquivo de config
-
-- Um cliente HTTP capaz de manipular as requisições, como o Postman, Insomnia ou similares, para testar e enviar
-o Token de autenticação nas requisições protegidas
+- Docker
+- Docker Compose
+- Cliente HTTP capaz de manipular as requisições, como o Postman ou similares
 
   
 ## Instalação e execução
 
-Siga os passos para obter e executar o projeto na sua máquina
+Siga os passos para obter, configurar e executar o projeto na sua máquina
 
 1. Clone ou faça o [download](https://github.com/gabriellrocha/task-manager-api-jwt/archive/refs/heads/main.zip) do repositório
+
 ```
 git clone https://github.com/gabriellrocha/task-manager-api-jwt.git
 ```
-2. Navegue até a pasta raiz
-```
-cd task-manager-api
-```
-3. Execute `mvn clean install` para construir o projeto e baixar as dependências
 
-4. Inicie a aplicação com `mvn spring-boot:run`
+### Configuração
+Crie um arquivo '.env' na `raiz do projeto` e preencha com os valores das variáveis de ambiente conforme
+o modelo presente no arquivo '.env.example' também na raiz deste projeto
 
-5. Use o cliente HTTP para testar os endpoints da API. Certifique-se de fazer o registro e enviar o Token de
-autenticação nos endpoints protegidos
+- Nota: A chave secreta deve estar em Base64 e ter pelo menos 256bits
+- Use o seguinte utilitário no linux para obter a sua chave secreta que atenda aos requisítos
+
+```
+openssl rand -base64 32
+```
+
+2. Na pasta raiz, construa e execute os containers da aplicação e do banco de dados com Docker Compose
+
+```
+docker-compose up --build
+```
+- A API estará disponível em `http://localhost:8080`
+
+3. Use o cliente HTTP para testar os endpoints da API. Certifique-se de registrar e enviar o Token de autenticação
+para os endpoints protegidos
 
 ## Endpoints
 

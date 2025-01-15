@@ -23,8 +23,6 @@ public class TaskController {
     @PostMapping("tasks")
     public ResponseEntity<TaskResponse> create(@Valid @RequestBody TaskRequest request) {
 
-        System.out.println(request);
-
         return ResponseEntity.status(HttpStatus.CREATED).body(taskService.create(request));
 
     }
