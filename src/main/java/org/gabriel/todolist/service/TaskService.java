@@ -42,6 +42,18 @@ public class TaskService {
         return taskMapper.fromTask(repository.save(task));
     }
 
+    public TaskResponse getTaskById(Long id) {
+
+        Task task = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Task with id [%s] not found".formatted(id)));
+
+        authorizationService.checkAuthorization(task);
+
+        return taskMapper.fromTask(task);
+
+    }
+
     public TaskResponse update(Long id, TaskRequest request) {
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();

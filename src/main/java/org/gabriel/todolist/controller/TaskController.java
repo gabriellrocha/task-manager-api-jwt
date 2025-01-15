@@ -28,9 +28,9 @@ public class TaskController {
     }
 
     @GetMapping("tasks/{id}")
-    public ResponseEntity<?> findById(@PathVariable Long id, @RequestBody Task task) { // todo - implementar
+    public ResponseEntity<?> findById(@PathVariable Long id) {
 
-        return null;
+        return ResponseEntity.ok(taskService.getTaskById(id));
     }
 
     @PutMapping("tasks/{id}")
